@@ -65,6 +65,8 @@ func (oracle *Oracle) SuggestOptimismPriorityFee(ctx context.Context, h *types.H
 		return suggestion
 	}
 
+	log.Info("SuggestOptimismPriorityFee data", "block", headHash, "gasUsed", h.GasUsed, "maxTxGas", maxTxGasUsed)
+
 	if h.GasUsed+maxTxGasUsed > h.GasLimit {
 		// A block is "at capacity" if, when it is built, there is a pending tx in the txpool that
 		// could not be included because the block's gas limit would be exceeded. Since we don't
@@ -96,6 +98,8 @@ func (oracle *Oracle) SuggestOptimismPriorityFee(ctx context.Context, h *types.H
 		sort.Sort(tips)
 		median := tips[len(tips)/2]
 		newSuggestion := new(big.Int).Add(median, new(big.Int).Div(median, big.NewInt(10)))
+		log.Info("SuggestOptimismPriorityFee suggestion", "block", headHash, "suggestion", newSuggestion)
+
 		// use the new suggestion only if it's bigger than the minimum
 		if newSuggestion.Cmp(suggestion) > 0 {
 			suggestion = newSuggestion
