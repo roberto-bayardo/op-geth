@@ -76,6 +76,7 @@ func (args *TransactionArgs) data() []byte {
 
 // setDefaults fills in default values for unspecified tx fields.
 func (args *TransactionArgs) setDefaults(ctx context.Context, b Backend) error {
+	log.Info("setFeeDefaults", "gasprice", args.GasPrice, "maxFee", args.MaxFeePerGas, "tip", args.MaxPriorityFeePerGas)
 	if err := args.setFeeDefaults(ctx, b); err != nil {
 		return err
 	}
@@ -128,6 +129,7 @@ func (args *TransactionArgs) setDefaults(ctx context.Context, b Backend) error {
 	} else {
 		args.ChainID = (*hexutil.Big)(want)
 	}
+	log.Info("setFeeDefaults done", "gasprice", args.GasPrice, "maxFee", args.MaxFeePerGas, "tip", args.MaxPriorityFeePerGas)
 	return nil
 }
 
