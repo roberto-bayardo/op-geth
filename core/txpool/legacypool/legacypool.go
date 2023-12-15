@@ -235,7 +235,7 @@ type LegacyPool struct {
 
 	changesSinceReorg int // A counter for how many drops we've performed in-between reorg.
 
-	l1CostFn txpool.L1CostFunc // To apply L1 costs as rollup, optional field, may be nil.
+	l1CostFn types.L1CostFunc // To apply L1 costs as rollup, optional field, may be nil.
 }
 
 type txpoolResetRequest struct {

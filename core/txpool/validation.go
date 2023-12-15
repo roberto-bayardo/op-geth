@@ -213,7 +213,7 @@ type ValidationOptionsWithState struct {
 	ExistingCost func(addr common.Address, nonce uint64) *big.Int
 
 	// L1CostFn is an optional extension, to validate L1 rollup costs of a tx
-	L1CostFn L1CostFunc
+	L1CostFn types.L1CostFunc
 }
 
 // ValidateTransactionWithState is a helper method to check whether a transaction

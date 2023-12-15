@@ -73,7 +73,7 @@ func NewEVMBlockContext(header *types.Header, chain ChainContext, author *common
 		BlobBaseFee: blobBaseFee,
 		GasLimit:    header.GasLimit,
 		Random:      random,
-		L1CostFunc:  types.NewL1CostFunc(config, statedb),
+		L1CostFunc:  types.NewL1CostFunc(config, statedb, header.Time),
 	}
 }
 
