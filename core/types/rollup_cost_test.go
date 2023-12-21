@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestL1CostFunc(t *testing.T) {
+func TestPreEcotoneL1CostFunc(t *testing.T) {
 	basefee := big.NewInt(1)
 	overhead := big.NewInt(1)
 	scalar := big.NewInt(1_000_000)
@@ -25,7 +25,7 @@ func TestL1CostFunc(t *testing.T) {
 	require.Equal(t, big.NewInt(481), g1)
 }
 
-func TestExtractGasParams(t *testing.T) {
+func TestExtractPreEcotoneGasParams(t *testing.T) {
 	regolithTime := uint64(1)
 	config := &params.ChainConfig{
 		Optimism:     params.OptimismTestConfig.Optimism,
@@ -73,4 +73,42 @@ func TestExtractGasParams(t *testing.T) {
 
 	c, _ = costFuncRegolith(emptyTx.RollupCostData())
 	require.Equal(t, big.NewInt(481), c)
+}
+
+func TestExtractEcotoneGasParams(t *testing.T) {
+	uint256 := make([]byte, 32)
+	uint64 := make([]byte, 8)
+	uint32 := make([]byte, 4)
+
+	ignored := big.NewInt(1234)
+
+	selector := []byte{0x44, 0x0a, 0x5e, 0x20}
+
+	basefeeScalar := big.NewInt(2)
+	blobBasefeeScalar := big.NewInt(3)
+
+	basefee := big.NewInt(1000 * 1e6)
+	blobBasefee := big.NewInt(10 * 1e6)
+
+	data := []byte{}
+	data = append(data, selector...) // selector
+	data = append(data, basefeeScalar.FillBytes(uint32)...)
+	data = append(data, blobBasefeeScalar.FillBytes(uint32)...)
+	data = append(data, ignored.FillBytes(uint64)...)
+	data = append(data, ignored.FillBytes(uint64)...)
+	data = append(data, ignored.FillBytes(uint64)...)
+	data = append(data, basefee.FillBytes(uint256)...)
+	data = append(data, blobBasefee.FillBytes(uint256)...)
+	data = append(data, ignored.FillBytes(uint256)...)
+	data = append(data, ignored.FillBytes(uint256)...)
+
+	_, costFunc, err := extractL1GasParamsEcotone(data)
+	require.NoError(t, err)
+
+	c, g := costFunc(emptyTx.RollupCostData())
+
+	// emptyTx has calldata gas == 480
+	require.Equal(t, int64(480), g.Int64())
+	// (480/16)*(2*16*1000 + 3*10) == 960900
+	require.Equal(t, int64(960900), c.Int64())
 }
