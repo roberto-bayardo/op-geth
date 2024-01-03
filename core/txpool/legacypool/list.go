@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/core/types"
 )
 
@@ -308,7 +307,7 @@ func (l *list) Contains(nonce uint64) bool {
 //
 // If the new transaction is accepted into the list, the lists' cost and gas
 // thresholds are also potentially updated.
-func (l *list) Add(tx *types.Transaction, priceBump uint64, l1CostFn txpool.L1CostFunc) (bool, *types.Transaction) {
+func (l *list) Add(tx *types.Transaction, priceBump uint64, l1CostFn types.L1CostFunc) (bool, *types.Transaction) {
 	// If there's an older better transaction, abort
 	old := l.txs.Get(tx.Nonce())
 	if old != nil {
@@ -337,7 +336,7 @@ func (l *list) Add(tx *types.Transaction, priceBump uint64, l1CostFn txpool.L1Co
 	// Add new tx cost to totalcost
 	l.totalcost.Add(l.totalcost, tx.Cost())
 	if l1CostFn != nil {
-		if l1Cost := l1CostFn(tx.RollupDataGas()); l1Cost != nil { // add rollup cost
+		if l1Cost := l1CostFn(tx.RollupCostData()); l1Cost != nil { // add rollup cost
 			l.totalcost.Add(l.totalcost, l1Cost)
 		}
 	}

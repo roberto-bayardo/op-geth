@@ -213,7 +213,7 @@ type ValidationOptionsWithState struct {
 	ExistingCost func(addr common.Address, nonce uint64) *big.Int
 
 	// L1CostFn is an optional extension, to validate L1 rollup costs of a tx
-	L1CostFn L1CostFunc
+	L1CostFn types.L1CostFunc
 }
 
 // ValidateTransactionWithState is a helper method to check whether a transaction
@@ -245,7 +245,7 @@ func ValidateTransactionWithState(tx *types.Transaction, signer types.Signer, op
 		cost    = tx.Cost()
 	)
 	if opts.L1CostFn != nil {
-		if l1Cost := opts.L1CostFn(tx.RollupDataGas()); l1Cost != nil { // add rollup cost
+		if l1Cost := opts.L1CostFn(tx.RollupCostData()); l1Cost != nil { // add rollup cost
 			cost = cost.Add(cost, l1Cost)
 		}
 	}
