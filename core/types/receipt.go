@@ -570,15 +570,8 @@ func (rs Receipts) DeriveFields(config *params.ChainConfig, hash common.Hash, nu
 		}
 	}
 	if config.Optimism != nil && len(txs) >= 2 { // need at least an info tx and a non-info tx
-		var l1Basefee *big.Int
-		var costFunc l1CostFunc
-		var feeScalar *big.Float // only meaningful before Ecotone, left nil otherwise
-		var err error
-		if !config.IsEcotone(time) {
-			if l1Basefee, costFunc, feeScalar, err = extractL1GasParams(config, time, txs[0].Data()); err != nil {
-				return err
-			}
-		} else if l1Basefee, costFunc, err = extractL1GasParamsEcotone(txs[0].Data()); err != nil {
+		l1Basefee, costFunc, feeScalar, err := extractL1GasParams(config, time, txs[0].Data())
+		if err != nil {
 			return err
 		}
 		for i := 0; i < len(rs); i++ {

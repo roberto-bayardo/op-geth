@@ -137,8 +137,8 @@ func newL1CostFunc(l1Basefee, overhead, scalar *big.Int, isRegolith bool) l1Cost
 }
 
 var (
-	ecotoneDivisor *big.Int = big.NewInt(1_000_000 * 16)
-	sixteen        *big.Int = big.NewInt(16)
+	ecotoneDivisor = big.NewInt(1_000_000 * 16)
+	sixteen        = big.NewInt(16)
 )
 
 func newL1CostFuncEcotone(l1Basefee, l1BlobBasefee, l1BasefeeScalar, l1BlobBasefeeScalar *big.Int) l1CostFunc {
@@ -173,6 +173,11 @@ func newL1CostFuncEcotone(l1Basefee, l1BlobBasefee, l1BasefeeScalar, l1BlobBasef
 // extractL1GasParams extracts the gas parameters necessary to compute gas costs from L1 block info
 // calldata prior to the Ecotone upgrade..
 func extractL1GasParams(config *params.ChainConfig, time uint64, data []byte) (l1Basefee *big.Int, costFunc l1CostFunc, feeScalar *big.Float, err error) {
+	if config.IsEcotone(time) {
+		l1Basefee, costFunc, err = extractL1GasParamsEcotone(data)
+		return
+	}
+
 	// data consists of func selector followed by 7 ABI-encoded parameters (32 bytes each)
 	if len(data) < 4+32*8 {
 		return nil, nil, nil, fmt.Errorf("expected at least %d L1 info bytes, got %d", 4+32*8, len(data))
